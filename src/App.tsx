@@ -16,11 +16,14 @@ type Message = {
 
 function App() {
   const [apiUrl, setApiUrl] = useState('https://4100.api.green-api.com')
-  const [idInstance, setIdInstance] = useState('410022751922')
+  const [idInstance, setIdInstance] = useState('')
   const [apiTokenInstance, setApiTokenInstance] = useState('')
-  const [chatId, setChatId] = useState('412827741')
+  const [chatId, setChatId] = useState('')
   const [messageText, setMessageText] = useState('')
-  const [contactName, setContactName] = useState('Telegram chat')
+
+  const [contactName, setContactName] = useState(() => {
+    return localStorage.getItem('green-api-contact-name') || 'Telegram chat'
+  })
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
 
@@ -44,6 +47,13 @@ function App() {
       JSON.stringify(messages),
     )
   }, [messages])
+
+  useEffect(() => {
+    localStorage.setItem(
+      'green-api-contact-name',
+      contactName,
+    )
+  }, [contactName])
 
   useEffect(() => {
     if (!apiUrl || !idInstance || !apiTokenInstance || !chatId) {
@@ -186,7 +196,10 @@ function App() {
 
   const handleClearHistory = () => {
     setMessages([])
+    setContactName('Telegram chat')
+
     localStorage.removeItem('green-api-chat-messages')
+    localStorage.removeItem('green-api-contact-name')
   }
 
   const formatTime = (timestamp: number) =>
